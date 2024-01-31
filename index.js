@@ -1,8 +1,8 @@
 // Creating essential constants
-const fs = require('fs');
+const fs = require("fs");
 const inquirer = require("inquirer");
 
-// Creating constant with shapes parameters 
+// Creating constant with shape parameters 
 
 const {Square, Triangle, Circle} = require("./lib/shapes");
 
@@ -18,12 +18,12 @@ class svgLogo {
 
     render(){
         
-        return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="300" height="200" height="200">${this.shapeElement}${this.textElement}</svg>`
+        return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="300" height="200">${this.shapeElement}${this.textElement}</svg>`
      
     }
 
     setTextElement(text, color){
-        this.textElement = `<text x="150" y="125" font-size="60" text-anchor="middle" fill="${color}">${text}</text>`
+        this.textElement = `<text x="150" y="135" font-size="60" text-anchor="middle" fill="${color}">${text}</text>`
     }
 
     setShapeElement(shape){
@@ -47,31 +47,86 @@ const questions = [{
 }, {
 
     type: "list",
-    name: "pixel-image",
+    name: "shape-type",
     message: "Which pixel image would you like?",
     choices: ["Square", "Triangle", "Circle"]
 }, {
     
     type: "input",
-    name: "shape",
+    name: "shape-fill",
     message: "Enter a color keyword, or hexadecimal number for svg logo's shape:"
 
 },
 ];
 
-// Creating function to write logo file (logo.svg)
+// Creating function to write logo file (logo.svg) same as README.md homework
 
 function writeToFile(fileName, data) {
-    console.log("Writing [" + data + "] to file [" fileName + "]")
+    console.log(fileName);
+    console.log(data);
 
-    fs.writeFile(fileName, data, function (err) {
-        if (err) {
-            return console.log(err);
+    fs.writeFile(fileName, data, function (error) {
+        if (error) {
+            return console.log(error);
         }
         console.log("Success! Your logo.svg file was generated.")
     });
 
 };
 
-// Creating function to initialize app
+// Creating a async function to init(ialize) app, like instructor told us in class of js being single threaded, this will trigger init and then pull the writeToFile function above at the end to make logo.svg file
 
+async function init() {
+    
+    // Using var vs. let to organize better like instructor mentioned, and also knowing var can be used for global callback 
+	var svgString = "";
+	let svgFile = "logo.svg";
+
+    // Prompt the user for answers
+    const answers = await inquirer.prompt(questions);
+
+	// User text 1-3 chars, valid entry 0 or 4+ chars, invalid entry
+	var user_text = "";
+	if (answers.text.length > 0 && answers.text.length < 4) {
+		
+        user_text = answers.text;
+
+	} 
+    
+	user_font_color = answers["text-color"];
+
+	user_shape_fill = answers["shape-fill"];
+	
+	user_shape_type = answers["shape-type"];
+
+	let user_shape;
+	if (user_shape_type === "Square" || user_shape_type === "square") {
+		
+        user_shape = new Square();	
+	}
+
+	else if (user_shape_type === "Circle" || user_shape_type === "circle") {
+		
+        user_shape = new Circle();
+	}
+
+	else if (user_shape_type === "Triangle" || user_shape_type === "triangle") {
+		
+        user_shape = new Triangle();
+	}
+
+	user_shape.setColor(user_shape_fill);
+
+
+	// Creating var for class svgLogo, data inputs which will be written to file logo.svg
+	var svg = new svgLogo();
+	svg.setTextElement(user_text, user_font_color);
+	svg.setShapeElement(user_shape);
+	svgString = svg.render();
+	
+
+    // Writing file, svgFile (name) and svgString (data to render logo)
+	writeToFile(svgFile, svgString); 
+};
+
+init();
