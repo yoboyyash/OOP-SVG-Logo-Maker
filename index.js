@@ -82,16 +82,21 @@ async function init() {
 	var svgString = "";
 	let svgFile = "logo.svg";
 
-    // Prompt the user for answers
+    // Prompt questions
     const answers = await inquirer.prompt(questions);
 
-	// User text 1-3 chars, valid entry 0 or 4+ chars, invalid entry
+	// Character input and acceptance 
 	var user_text = "";
 	if (answers.text.length > 0 && answers.text.length < 4) {
 		
         user_text = answers.text;
 
-	} 
+	} else {
+
+        console.log("Invalid Character rule! Enter 1-3 characters only.");
+    
+        return;
+    }
     
 	user_font_color = answers["text-color"];
 
